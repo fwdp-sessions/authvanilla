@@ -1,4 +1,9 @@
-import { resolve } from "path";
 import { defineConfig } from "vite";
-
-export default defineConfig({});
+const BASE = "/authvanilla";
+export default defineConfig({
+  base: process.env.NODE_ENV === "production" ? BASE : "/",
+  build: {
+    outDir: "./dist",
+    emptyOutDir: true,
+  },
+});
