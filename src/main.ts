@@ -6,6 +6,9 @@ import db from "./data.json";
 import { RegisterForm } from "./register";
 import { headingBuilder } from "./GenericHeaders";
 
+export const BASE =
+  process.env.NODE_ENV === "production" ? "/authvanilla/" : "/";
+
 // Define Global Variables and Functions
 export type User = {
   email: string;
@@ -60,11 +63,11 @@ export const App = Document.querySelector<HTMLDivElement>("#app");
 const Navigation = Document.createElement("div");
 
 export const Links = `
-      <a href="/">Home</a>
-      <a href="/login">Login</a>
-      <a href="/register">Register</a>
-      <a href="/about">About</a>
-      <a href="/error">Error</a>
+      <a href="${BASE}">Home</a>
+      <a href="${BASE}login">Login</a>
+      <a href="${BASE}register">Register</a>
+      <a href="${BASE}about">About</a>
+      <a href="${BASE}error">Error</a>
 `;
 Navigation!.className = "navbar";
 Navigation!.innerHTML = `
@@ -101,7 +104,7 @@ const About = `
 `;
 
 const Error = `
-      <a href="/">Go Home</a>
+      <a href="${BASE}">Go Home</a>
 `;
 
 const ErrorElement = document.createElement("div");
@@ -132,7 +135,7 @@ LoginForm.appendChild(headingBuilder("Login", "1"));
 LoginPage.appendChild(LoginForm);
 const RegisterLink = Document.createElement("p");
 RegisterLink.innerHTML = `
-<h4>Don't have an account? <a href="/register">Register</a> here! </h4>
+<h4>Don't have an account? <a href="${BASE}register">Register</a> here! </h4>
 `;
 LoginPage.appendChild(RegisterLink);
 
@@ -197,7 +200,7 @@ const bootstrap = () => {
     LogOutButton.textContent = "Log Out";
     LogOutButton.addEventListener("click", () => {
       AppState.logOut();
-      window.location.href = "/";
+      window.location.href = `${BASE}`;
     });
 
     const currentUser = JSON.parse(localStorage.getItem("currentUser") ?? "");
@@ -209,13 +212,13 @@ const bootstrap = () => {
     Dashboard.appendChild(LogOutButton);
     renderElement(Dashboard);
   } else {
-    if (LOCATION === "/") {
+    if (LOCATION === `${BASE}`) {
       renderInnerHtml(Home);
-    } else if (LOCATION === "/login") {
+    } else if (LOCATION === `${BASE}login`) {
       replaceElement(LoginPage);
-    } else if (LOCATION == "/register") {
+    } else if (LOCATION == `${BASE}register`) {
       replaceElement(RegisterPage);
-    } else if (LOCATION == "/about") {
+    } else if (LOCATION == `${BASE}about`) {
       renderInnerHtml(About);
     } else {
       renderElement(ErrorElement);

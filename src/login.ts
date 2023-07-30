@@ -1,5 +1,5 @@
 import { emailInput, genericSubmitButton, passwordInput } from "./inputs";
-import { loginHandler } from "./main";
+import { BASE, loginHandler } from "./main";
 
 export const LoginForm = document.createElement("form");
 
@@ -23,7 +23,7 @@ LoginForm.addEventListener("submit", (event: SubmitEvent) => {
     formData.get("password") as string
   );
   if (status) {
-    window.location.href = "/";
+    window.location.href = `${BASE}`;
   } else {
     ErrorMessage.textContent = message;
   }

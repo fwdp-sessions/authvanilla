@@ -5,7 +5,7 @@ import {
   nameInput,
   passwordInput,
 } from "./inputs";
-import { registerHandler } from "./main";
+import { BASE, registerHandler } from "./main";
 
 export const RegisterForm = document.createElement("form");
 const registerButton = genericSubmitButton("Register");
@@ -35,7 +35,7 @@ RegisterForm.addEventListener("submit", (event: SubmitEvent) => {
       formData.get("nameInput") as string
     );
     if (status) {
-      window.location.href = "/login";
+      window.location.href = `${BASE}login`;
     } else {
       ErrorMessage.textContent = message;
     }
