@@ -64,10 +64,10 @@ const Navigation = Document.createElement("div");
 
 export const Links = `
       <a href="${BASE}">Home</a>
-      <a href="${BASE}login">Login</a>
-      <a href="${BASE}register">Register</a>
-      <a href="${BASE}about">About</a>
-      <a href="${BASE}error">Error</a>
+      <a href="${BASE}login/">Login</a>
+      <a href="${BASE}register/">Register</a>
+      <a href="${BASE}about/">About</a>
+      <a href="${BASE}error/">Error</a>
 `;
 Navigation!.className = "navbar";
 Navigation!.innerHTML = `
@@ -135,7 +135,7 @@ LoginForm.appendChild(headingBuilder("Login", "1"));
 LoginPage.appendChild(LoginForm);
 const RegisterLink = Document.createElement("p");
 RegisterLink.innerHTML = `
-<h4>Don't have an account? <a href="${BASE}register">Register</a> here! </h4>
+<h4>Don't have an account? <a href="${BASE}register/">Register</a> here! </h4>
 `;
 LoginPage.appendChild(RegisterLink);
 
@@ -214,11 +214,11 @@ const bootstrap = () => {
   } else {
     if (LOCATION === `${BASE}`) {
       renderInnerHtml(Home);
-    } else if (LOCATION === `${BASE}login`) {
+    } else if (LOCATION === `${BASE}login/`) {
       replaceElement(LoginPage);
-    } else if (LOCATION == `${BASE}register`) {
+    } else if (LOCATION == `${BASE}register/`) {
       replaceElement(RegisterPage);
-    } else if (LOCATION == `${BASE}about`) {
+    } else if (LOCATION == `${BASE}about/`) {
       renderInnerHtml(About);
     } else {
       renderElement(ErrorElement);
