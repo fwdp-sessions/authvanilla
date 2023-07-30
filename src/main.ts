@@ -3,6 +3,8 @@ import { LoginForm } from "./login";
 import typescriptLogo from "./typescript.svg";
 import viteLogo from "/vite.svg";
 import db from "./data.json";
+import { RegisterForm } from "./register";
+import { headingBuilder } from "./GenericHeaders";
 
 // Define Global Variables and Functions
 export type User = {
@@ -22,9 +24,12 @@ export type AppStateType = {
 export const AppState: AppStateType = {
   currentUser: undefined,
   logIn(newUser: User) {
-    this.currentUser = newUser;
     localStorage.setItem("currentUser", JSON.stringify(newUser));
     localStorage.setItem("isLoggedIn", JSON.stringify(true));
+    const current = JSON.parse(
+      localStorage.getItem("currentUser") ?? ""
+    ) as User;
+    this.currentUser = current;
   },
   getUser() {
     const local = JSON.parse(localStorage.getItem("currentUser") ?? "") as User;
@@ -33,6 +38,7 @@ export const AppState: AppStateType = {
   },
   logOut: () => {
     localStorage.removeItem("currentUser");
+    localStorage.removeItem("Users");
     localStorage.setItem("isLoggedIn", JSON.stringify(false));
   },
 };
@@ -122,6 +128,7 @@ const replaceElement = (element: HTMLElement) => {
 
 const LoginPage = Document.createElement("div");
 LoginPage.className = "loginPage";
+LoginForm.appendChild(headingBuilder("Login", "1"));
 LoginPage.appendChild(LoginForm);
 const RegisterLink = Document.createElement("p");
 RegisterLink.innerHTML = `
@@ -130,6 +137,8 @@ RegisterLink.innerHTML = `
 LoginPage.appendChild(RegisterLink);
 
 const RegisterPage = Document.createElement("div");
+RegisterPage.appendChild(headingBuilder("Register", "1"));
+RegisterPage.appendChild(RegisterForm);
 
 export const loginHandler = (
   email: string,
@@ -138,7 +147,10 @@ export const loginHandler = (
   if (!checkEmail(email)) {
     return { status: false, message: "Invalid Credentials" };
   } else {
-    const user = UsersDB.find((user) => user.email === email) as User;
+    const currentUsers = JSON.parse(
+      localStorage.getItem("Users") ?? ""
+    ) as User[];
+    const user = currentUsers.find((user) => user.email === email) as User;
     if (user!.password === password) {
       AppState.logIn(user);
       return { status: true, message: "Logged in successfully" };
@@ -153,15 +165,32 @@ export const registerHandler = (
   password: string,
   name: string
 ): GenericMessage => {
-  console.log(email, password, name);
-  return { status: false, message: "Email Already Exists" };
+  if (!checkEmail(email)) {
+    UsersDB.push({ email, password, name });
+    localStorage.setItem("Users", JSON.stringify(UsersDB));
+    return { status: true, message: "Registered successfully" };
+  } else {
+    return { status: false, message: "Email Already Exists" };
+  }
 };
 
 const checkEmail = (email: string): boolean => {
-  return UsersDB.find((user) => user.email === email) ? true : false;
+  const currentUsers = JSON.parse(
+    localStorage.getItem("Users") ?? ""
+  ) as User[];
+  return currentUsers.find((user) => user.email === email) ? true : false;
 };
 const bootstrap = () => {
+  if (localStorage.getItem("Users") === null) {
+    localStorage.setItem("Users", JSON.stringify(UsersDB));
+    console.log(localStorage.getItem("Users"));
+  }
+
+  // TODO: Needs Refactoring
   if (JSON.parse(localStorage.getItem("isLoggedIn") ?? "false")) {
+    // BUG: Bug when state is always true, kept refreshing.
+    // FIX: Try different approach
+    // window.location.href = "/dashboard";
     const Dashboard = Document.createElement("div");
     const WelcomeMessage = Document.createElement("div");
     const LogOutButton = Document.createElement("button");
@@ -170,8 +199,11 @@ const bootstrap = () => {
       AppState.logOut();
       window.location.href = "/";
     });
+
+    const currentUser = JSON.parse(localStorage.getItem("currentUser") ?? "");
+
     WelcomeMessage.innerHTML = `
-      <h1>Welcome ${AppState.currentUser?.name}</h1>
+      <h1>Welcome ${currentUser.name}</h1>
     `;
     Dashboard.appendChild(WelcomeMessage);
     Dashboard.appendChild(LogOutButton);
