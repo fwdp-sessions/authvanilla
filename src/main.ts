@@ -1,6 +1,8 @@
-import "./style.css";
+// import "./style.css";
+import { LoginForm } from "./login";
 import typescriptLogo from "./typescript.svg";
 import viteLogo from "/vite.svg";
+import db from "./data.json";
 
 // Define Global Variables and Functions
 export type User = {
@@ -9,38 +11,47 @@ export type User = {
   name: string;
 };
 
+// TODO: Fix State should be on localStorage
 export type AppStateType = {
   currentUser: User | undefined;
-  isLoggedIn: boolean;
-  setUser: (user: User) => void;
+  logIn: (user: User) => void;
   getUser: () => User | undefined;
+  logOut: () => void;
 };
 
 export const AppState: AppStateType = {
   currentUser: undefined,
-  isLoggedIn: false,
-  setUser(newUser: User) {
+  logIn(newUser: User) {
     this.currentUser = newUser;
+    localStorage.setItem("currentUser", JSON.stringify(newUser));
+    localStorage.setItem("isLoggedIn", JSON.stringify(true));
   },
   getUser() {
-    if (this.currentUser) {
-      return this.currentUser;
-    } else {
-      return undefined;
-    }
+    const local = JSON.parse(localStorage.getItem("currentUser") ?? "") as User;
+    this.currentUser = local !== null ? local : undefined;
+    return this.currentUser;
+  },
+  logOut: () => {
+    localStorage.removeItem("currentUser");
+    localStorage.setItem("isLoggedIn", JSON.stringify(false));
   },
 };
 
-export type CurrentUser = {
-  user: User;
-  setCurrent: (user: User) => {};
-  getUser: User;
+export type GenericMessage = {
+  status: boolean;
+  message: string;
 };
+
+const UsersDB: User[] = db.map((user) => user as User);
+
+console.log(UsersDB);
 
 export const LOCATION = location.pathname;
 export const Location = location;
 export const Document = document;
-export const App = document.querySelector<HTMLDivElement>("#app");
+export const App = Document.querySelector<HTMLDivElement>("#app");
+
+const Navigation = Document.createElement("div");
 
 export const Links = `
       <a href="/">Home</a>
@@ -48,6 +59,12 @@ export const Links = `
       <a href="/register">Register</a>
       <a href="/about">About</a>
       <a href="/error">Error</a>
+`;
+Navigation!.className = "navbar";
+Navigation!.innerHTML = `
+    <div>
+        ${Links}
+    </div>
 `;
 
 const Home = `
@@ -68,22 +85,6 @@ const Home = `
   </div>
 `;
 
-const Login = `
-    <h1> Login </h1>
-    <div class="card">
-    <div class="card">
-        ${Links}
-    </div>
-    </div>
-`;
-const Register = `
-    <h1> Register </h1>
-    <div class="card">
-    <div class="card">
-        ${Links}
-    </div>
-    </div>
-`;
 const About = `
     <h1> About </h1>
     <div class="card">
@@ -111,25 +112,77 @@ const renderInnerHtml = (element: string) => {
 };
 
 const renderElement = (element: HTMLElement) => {
+  App!.appendChild(Navigation);
   App!.appendChild(element);
 };
 
+const replaceElement = (element: HTMLElement) => {
+  App!.replaceWith(element);
+};
+
+const LoginPage = Document.createElement("div");
+LoginPage.className = "loginPage";
+LoginPage.appendChild(LoginForm);
+const RegisterLink = Document.createElement("p");
+RegisterLink.innerHTML = `
+<h4>Don't have an account? <a href="/register">Register</a> here! </h4>
+`;
+LoginPage.appendChild(RegisterLink);
+
+const RegisterPage = Document.createElement("div");
+
+export const loginHandler = (
+  email: string,
+  password: string
+): GenericMessage => {
+  if (!checkEmail(email)) {
+    return { status: false, message: "Invalid Credentials" };
+  } else {
+    const user = UsersDB.find((user) => user.email === email) as User;
+    if (user!.password === password) {
+      AppState.logIn(user);
+      return { status: true, message: "Logged in successfully" };
+    } else {
+      return { status: false, message: "Password Incorrect" };
+    }
+  }
+};
+
+export const registerHandler = (
+  email: string,
+  password: string,
+  name: string
+): GenericMessage => {
+  console.log(email, password, name);
+  return { status: false, message: "Email Already Exists" };
+};
+
+const checkEmail = (email: string): boolean => {
+  return UsersDB.find((user) => user.email === email) ? true : false;
+};
 const bootstrap = () => {
-  if (AppState.isLoggedIn) {
+  if (JSON.parse(localStorage.getItem("isLoggedIn") ?? "false")) {
     const Dashboard = Document.createElement("div");
     const WelcomeMessage = Document.createElement("div");
+    const LogOutButton = Document.createElement("button");
+    LogOutButton.textContent = "Log Out";
+    LogOutButton.addEventListener("click", () => {
+      AppState.logOut();
+      window.location.href = "/";
+    });
     WelcomeMessage.innerHTML = `
-      <h1>Welcome</h1>
+      <h1>Welcome ${AppState.currentUser?.name}</h1>
     `;
-
     Dashboard.appendChild(WelcomeMessage);
+    Dashboard.appendChild(LogOutButton);
+    renderElement(Dashboard);
   } else {
     if (LOCATION === "/") {
       renderInnerHtml(Home);
     } else if (LOCATION === "/login") {
-      renderInnerHtml(Login);
+      replaceElement(LoginPage);
     } else if (LOCATION == "/register") {
-      renderInnerHtml(Register);
+      replaceElement(RegisterPage);
     } else if (LOCATION == "/about") {
       renderInnerHtml(About);
     } else {

@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Master Q",
+    "email": "q@q.qq",
+    "password": "123q"
+  },
+  {
+    "name": "Master W",
+    "email": "w@w.ww",
+    "password": "123w"
+  },
+  {
+    "name": "Master E",
+    "email": "e@e.ee",
+    "password": "123e"
+  },
+  {
+    "name": "Master R",
+    "email": "r@r.rr",
+    "password": "123r"
+  }
+]

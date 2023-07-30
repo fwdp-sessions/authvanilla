@@ -95,3 +95,28 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.navbar {
+  display: flex;
+}
+
+.loginPage {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  justify-items: center;
+  place-items: center;
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+}
+.loginForm > * {
+  margin: 0.5em 0;
+}
+.loginForm > input {
+  font-size: 1.5rem;
+}
